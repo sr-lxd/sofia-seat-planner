@@ -131,7 +131,8 @@ macOS / Linux：
     │   ├── seats_login.html     # 学号录入页
     │   └── seats_index.html     # 排座参数页与结果表
     ├── requirements.txt
-    └── LICENSE
+    ├── LICENSE                 # MIT 许可证英文原件
+    └── LICENSE-ZH.md           # MIT 许可证中文对照
 
 ## 生产部署
 
@@ -179,4 +180,7 @@ macOS / Linux：
 
 ## 许可证
 
-本项目按 MIT License 发布，见 `LICENSE`。
+本项目按 MIT License 发布，版权所有 (c) 2026 Lu Xudong。
+
+- `LICENSE`：英文原件，以此版本为准。
+- `LICENSE-ZH.md`：中文对照，仅供阅读参考；发生歧义时以英文原件为准。
