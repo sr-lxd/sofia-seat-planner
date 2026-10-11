@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sofia座位分配 - 主界面</title>
+
+  <style>
+    /* 全局重置和基础样式 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+      /* 防止移动端页面晃动 */
+      overflow-x: hidden;
+      width: 100%;
+      position: relative;
+    }
+
+    /* 顶部按钮区 */
+    .top-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .top-buttons button {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #667eea;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      min-width: 120px;
+    }
+
+    .top-buttons button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    /* 主容器 */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 信息卡片 */
+    .info-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .info-card h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .info-card h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 2px;
+    }
+
+    .user-info {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .user-info strong {
+      color: #667eea;
+      font-weight: 700;
+    }
+
+    /* 配置表单 */
+    .config-form {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .config-form h3 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .input-group input[type="text"] {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .input-group input[type="text"]:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      color: #4a5568;
+      font-weight: 500;
+    }
+
+    /* 高级选项区域 */
+    .advanced-options {
+      border: 2px dashed #cbd5e0;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 25px;
+      background: rgba(248, 250, 252, 0.8);
+    }
+
+    .advanced-title {
+      color: #667eea;
+      font-weight: 700;
+      margin-bottom: 15px;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .help-text {
+      background: #e6fffa;
+      border: 1px solid #81e6d9;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #234e52;
+      line-height: 1.5;
+    }
+
+    /* 提交按钮 */
+    .submit-button {
+      width: 100%;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      margin-top: 30px;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .submit-button:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 警告信息 */
+    .warning {
+      background: #fed7d7;
+      color: #c53030;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #feb2b2;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* 结果区域 */
+    .result-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-top: 30px;
+    }
+
+    .result-container h3 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* 座位表样式 */
+    .result-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .result-table th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .result-table td {
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 50px;
+      vertical-align: middle;
+      border: 1px solid #e2e8f0;
+      background: white;
+    }
+
+    /* 学号框的样式 */
+    .seat-number {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      min-width: 45px;
+      border: 2px solid;
+    }
+
+    /* 不同类型座位的学号框颜色 */
+    .seat-number.special {
+      background-color: #fed7d7;
+      color: #c53030;
+      border-color: #c53030;
+    }
+
+    .seat-number.must-share {
+      background-color: #bee3f8;
+      color: #2b6cb0;
+      border-color: #2b6cb0;
+    }
+
+    .seat-number.must-diff {
+      background-color: #fef5e7;
+      color: #c05621;
+      border-color: #c05621;
+    }
+
+    .seat-number.normal {
+      background-color: #f7fafc;
+      color: #4a5568;
+      border-color: #cbd5e0;
+    }
+
+    .empty-seat {
+      background-color: #f1f5f9 !important;
+      color: #94a3b8 !important;
+      font-style: italic !important;
+    }
+
+    /* 移动端优化 */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+        /* 确保移动端不会水平滚动 */
+        overflow-x: hidden;
+        width: 100vw;
+      }
+
+      .main-container {
+        /* 确保主容器不超出视窗 */
+        max-width: calc(100vw - 30px);
+        width: 100%;
+      }
+
+      .info-card, .config-form, .result-container {
+        padding: 25px 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        /* 确保卡片不会超出视窗 */
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .info-card h2 {
+        font-size: 24px;
+      }
+
+      .config-form h3 {
+        font-size: 20px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .top-buttons {
+        justify-content: center;
+        /* 确保按钮区域不会超出 */
+        max-width: calc(100vw - 30px);
+        width: 100%;
+      }
+
+      .top-buttons button {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-width: 100px;
+        /* 确保按钮文字不会换行 */
+        white-space: nowrap;
+      }
+
+      .input-group input[type="text"] {
+        padding: 12px 16px;
+        /* 防止iOS自动缩放 - 关键！*/
+        font-size: 16px !important;
+        -webkit-text-size-adjust: 100%;
+        /* 防止输入框获得焦点时页面缩放 */
+        transform: translateZ(0);
+        -webkit-appearance: none;
+        border-radius: 12px;
+      }
+
+      .submit-button {
+        padding: 14px;
+        /* 防止iOS自动缩放 */
+        font-size: 16px !important;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      .result-table {
+        font-size: 12px;
+      }
+
+      .result-table th, .result-table td {
+        padding: 8px 4px;
+      }
+
+      /* 移动端学号框样式优化 */
+      .seat-number {
+        font-size: 11px !important;
+        padding: 6px 8px !important;
+        min-width: 35px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .main-container {
+        /* 更严格的宽度控制 */
+        max-width: calc(100vw - 20px);
+        width: 100%;
+      }
+
+      .info-card, .config-form, .result-container {
+        padding: 20px 15px;
+        /* 确保在小屏幕上不会超出 */
+        max-width: calc(100vw - 20px);
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .top-buttons {
+        flex-direction: column;
+        align-items: center;
+        /* 确保不会超出屏幕 */
+        max-width: calc(100vw - 20px);
+        width: 100%;
+      }
+
+      .top-buttons button {
+        width: 100%;
+        max-width: 200px;
+        margin-bottom: 8px;
+        min-width: auto;
+      }
+
+      .input-group input[type="text"] {
+        /* 移动端输入框优化 */
+        font-size: 16px !important;
+        padding: 14px 16px;
+        /* 确保在小屏幕上足够的触摸区域 */
+        min-height: 48px;
+        box-sizing: border-box;
+        width: 100%;
+      }
+
+      .checkbox-group {
+        padding: 12px 16px;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        /* 增大移动端复选框的点击区域 */
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+      }
+
+      /* 座位表横向滚动 */
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* 确保滚动区域不会超出 */
+        max-width: calc(100vw - 50px);
+        width: 100%;
+      }
+
+      .result-table {
+        min-width: 500px;
+        /* 确保表格在滚动容器内 */
+        width: auto;
+      }
+
+      /* 图例在小屏幕上的优化 */
+      .legend {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .legend-item {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+
+    /* 防止移动端横屏时的问题 */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 10px;
+        min-height: auto;
+      }
+      
+      .info-card, .config-form, .result-container {
+        margin-bottom: 15px;
+        padding: 15px;
+      }
+      
+      .info-card h2, .config-form h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      .top-buttons {
+        margin-bottom: 10px;
+      }
+    }
+
+    /* 超小屏幕优化 */
+    @media (max-width: 320px) {
+      body {
+        padding: 8px;
+      }
+
+      .main-container {
+        max-width: calc(100vw - 16px);
+      }
+
+      .info-card, .config-form, .result-container {
+        padding: 15px 12px;
+        max-width: calc(100vw - 16px);
+      }
+
+      .top-buttons button {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .input-group input[type="text"] {
+        padding: 12px 14px;
+        font-size: 16px !important;
+      }
+    }
+
+    /* 动画效果 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .info-card, .config-form, .result-container {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* 加载状态 */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .loading .submit-button {
+      background: #a0aec0;
+      cursor: not-allowed;
+    }
+
+    /* 图例 */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部按钮 -->
+  <div class="top-buttons">
+    <button onclick="location.href='{{ url_for('seats.login_page') }}'">
+      🔄 重新设置学号
+    </button>
+    <button onclick="location.href='http://fjzxedu.top:5002'">
+      🏠 回Sofia数智平台
+    </button>
+  </div>
+
+  <div class="main-container">
+    <!-- 用户信息卡片 -->
+    <div class="info-card">
+      <h2>🪑 Sofia座位分配系统</h2>
+      <div class="user-info">
+        <p>
+          您的用户ID: <strong>{{ user_id }}</strong><br/>
+          当前男生数: <strong>{{ male_count }}</strong>，女生数: <strong>{{ female_count }}</strong>，
+          合计: <strong>{{ male_count + female_count }}</strong> 人
+        </p>
+      </div>
+    </div>
+
+    <!-- 配置表单 -->
+    <div class="config-form">
+      <h3>📋 座位配置</h3>
+      {% if warning_msg %}
+      <div class="warning">
+        ⚠️ {{ warning_msg }}
+      </div>
+      {% endif %}
+
+      <form action="{{ url_for('seats.seat_result') }}" method="POST" id="seatForm">
+        <div class="form-grid">
+          <!-- 基础配置 -->
+          <div>
+            <div class="input-group">
+              <label for="colsInput">🏛️ 列数（每排座位数）</label>
+              <input type="text" name="cols" id="colsInput" value="8" placeholder="建议6-10列">
+              <div class="help-text">
+                💡 建议设置为偶数，便于同桌安排
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label for="rowsInput">📏 排数（初始值，会自动调整）</label>
+              <input type="text" name="rows" id="rowsInput" value="5" placeholder="建议4-8排">
+              <div class="help-text">
+                💡 系统会根据学生总数自动增加排数
+              </div>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" name="allow_mix" id="mixCheckbox" value="yes">
+              <label for="mixCheckbox">👫 允许男女混坐</label>
+            </div>
+          </div>
+
+          <!-- 高级选项 -->
+          <div class="advanced-options">
+            <div class="advanced-title">🔧 高级选项</div>
+            
+            <div class="input-group">
+              <label for="specialInput">📍 指定座位</label>
+              <input type="text" name="special_needs" id="specialInput" value="0" placeholder="例如: 5=(2,2);10=(1,1)">
+              <div class="help-text">
+                📝 格式：学号=(排,列)，多个用分号分隔<br>
+                例如：5=(2,2) 表示学号5坐在第2排第2列
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label for="mustShareInput">💕 必须同桌</label>
+              <input type="text" name="must_share" id="mustShareInput" value="0" placeholder="例如: 1,2;5,7">
+              <div class="help-text">
+                📝 格式：学号1,学号2，多对用分号分隔<br>
+                例如：1,2;5,7 表示1和2必须同桌，5和7必须同桌
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label for="mustDiffInput">🚫 不能同桌</label>
+              <input type="text" name="must_diff" id="mustDiffInput" value="0" placeholder="例如: 3,4;6,9">
+              <div class="help-text">
+                📝 格式：学号1,学号2，多对用分号分隔<br>
+                例如：3,4;6,9 表示3和4不能同桌，6和9不能同桌
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-button" id="generateBtn">
+          🎯 生成座位表
+        </button>
+      </form>
+    </div>
+
+    <!-- 结果显示 -->
+    {% if seats %}
+    <div class="result-container">
+      <h3>✨ 座位安排结果</h3>
+      
+      <!-- 图例 -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="seat-number normal" style="font-size: 11px; padding: 4px 8px; margin: 0;">普通</div>
+          <span>普通座位</span>
+        </div>
+        <div class="legend-item">
+          <div class="seat-number special" style="font-size: 11px; padding: 4px 8px; margin: 0;">指定</div>
+          <span>指定座位</span>
+        </div>
+        <div class="legend-item">
+          <div class="seat-number must-share" style="font-size: 11px; padding: 4px 8px; margin: 0;">同桌</div>
+          <span>必须同桌</span>
+        </div>
+        <div class="legend-item">
+          <div class="seat-number must-diff" style="font-size: 11px; padding: 4px 8px; margin: 0;">分离</div>
+          <span>不能同桌</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color empty-seat" style="padding: 4px 8px; border-radius: 4px; font-size: 11px;">空座</div>
+          <span>空座位</span>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>排 \ 列</th>
+              {% for c in range(cols) %}
+                <th>{{ c+1 }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in range(rows) %}
+            <tr>
+              <th>第{{ r+1 }}排</th>
+              {% for c in range(cols) %}
+              {% set seat = seats[r][c] %}
+              {% if seat %}
+                {# 根据后端传入的布尔字段, 动态确定学号框的 class #}
+                {% if seat.is_special %}
+                  {% set number_class = "special" %}
+                {% elif seat.is_must_share %}
+                  {% set number_class = "must-share" %}
+                {% elif seat.is_must_diff %}
+                  {% set number_class = "must-diff" %}
+                {% else %}
+                  {% set number_class = "normal" %}
+                {% endif %}
+                <td>
+                  <div class="seat-number {{ number_class }}">
+                    {{ seat.id }}号
+                  </div>
+                  <small>({{ seat.gender }})</small>
+                  <div style="font-size: 10px; color: #666; margin-top: 2px;">
+                    {% if seat.is_special %}🎯特殊{% endif %}
+                    {% if seat.is_must_share %}👫同桌{% endif %}
+                    {% if seat.is_must_diff %}🚫分离{% endif %}
+                    {% if not seat.is_special and not seat.is_must_share and not seat.is_must_diff %}⭐普通{% endif %}
+                  </div>
+                </td>
+              {% else %}
+                <td class="empty-seat">空座</td>
+              {% endif %}
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- JavaScript：表单验证和用户体验增强 -->
+  <script>
+    // 页面加载后回填表单数据
+    window.onload = function() {
+      loadFormData();
+      initFormValidation();
+    }
+
+    function loadFormData() {
+      let colsVal        = localStorage.getItem("seats_colsVal")        || "8";
+      let rowsVal        = localStorage.getItem("seats_rowsVal")        || "5";
+      let mixChecked     = localStorage.getItem("seats_mixChecked")     || "no";
+      let specialVal     = localStorage.getItem("seats_specialVal")     || "0";
+      let mustShareVal   = localStorage.getItem("seats_mustShareVal")   || "0";
+      let mustDiffVal    = localStorage.getItem("seats_mustDiffVal")    || "0";
+
+      document.getElementById("colsInput").value = colsVal;
+      document.getElementById("rowsInput").value = rowsVal;
+      document.getElementById("mixCheckbox").checked = (mixChecked === "yes");
+
+      document.getElementById("specialInput").value   = specialVal;
+      document.getElementById("mustShareInput").value = mustShareVal;
+      document.getElementById("mustDiffInput").value  = mustDiffVal;
+    }
+
+    function saveFormData(){
+      // 读取当前输入
+      let colsVal      = document.getElementById("colsInput").value.trim();
+      let rowsVal      = document.getElementById("rowsInput").value.trim();
+      let mixChecked   = document.getElementById("mixCheckbox").checked ? "yes":"no";
+      let specialVal   = document.getElementById("specialInput").value.trim();
+      let mustShareVal = document.getElementById("mustShareInput").value.trim();
+      let mustDiffVal  = document.getElementById("mustDiffInput").value.trim();
+
+      // 全角->半角转换
+      specialVal   = normalizePunctuation(specialVal);
+      mustShareVal = normalizePunctuation(mustShareVal);
+      mustDiffVal  = normalizePunctuation(mustDiffVal);
+
+      // 写回 input, 确保提交时是半角
+      document.getElementById("specialInput").value   = specialVal;
+      document.getElementById("mustShareInput").value = mustShareVal;
+      document.getElementById("mustDiffInput").value  = mustDiffVal;
+
+      // 存到 localStorage
+      localStorage.setItem("seats_colsVal", colsVal);
+      localStorage.setItem("seats_rowsVal", rowsVal);
+      localStorage.setItem("seats_mixChecked", mixChecked);
+      localStorage.setItem("seats_specialVal", specialVal);
+      localStorage.setItem("seats_mustShareVal", mustShareVal);
+      localStorage.setItem("seats_mustDiffVal", mustDiffVal);
+    }
+
+    // 全角符号转半角
+    function normalizePunctuation(str){
+      let mapping = {
+        '，':',','；':';','（':'(','）':')','：':':','。':'.','［':'[','］':']','"':'"','"':'"',''':"'",''':"'"
+      };
+      for(let full in mapping){
+        let half = mapping[full];
+        while(str.indexOf(full) >= 0){
+          str = str.replace(full, half);
+        }
+      }
+      return str;
+    }
+
+    function initFormValidation() {
+      const form = document.getElementById('seatForm');
+      const colsInput = document.getElementById('colsInput');
+      const rowsInput = document.getElementById('rowsInput');
+      const generateBtn = document.getElementById('generateBtn');
+
+      // 实时验证
+      function validateInputs() {
+        const colsValue = parseInt(colsInput.value) || 0;
+        const rowsValue = parseInt(rowsInput.value) || 0;
+        
+        const isValid = colsValue >= 4 && colsValue <= 20 && rowsValue >= 1 && rowsValue <= 15;
+        
+        if (isValid) {
+          generateBtn.disabled = false;
+          generateBtn.style.opacity = '1';
+        } else {
+          generateBtn.disabled = true;
+          generateBtn.style.opacity = '0.6';
+        }
+      }
+
+      // 绑定输入事件
+      colsInput.addEventListener('input', validateInputs);
+      rowsInput.addEventListener('input', validateInputs);
+      
+      // 初始验证
+      validateInputs();
+
+      // 表单提交处理
+      form.addEventListener('submit', function(e) {
+        // 显示加载状态
+        generateBtn.textContent = '🔄 正在生成座位表...';
+        generateBtn.disabled = true;
+        document.body.classList.add('loading');
+        
+        // 保存表单数据
+        saveFormData();
+        
+        // 验证输入
+        const colsValue = parseInt(colsInput.value) || 0;
+        const rowsValue = parseInt(rowsInput.value) || 0;
+        
+        if (colsValue < 4 || colsValue > 20) {
+          e.preventDefault();
+          alert('⚠️ 列数应在4-20之间');
+          resetButton();
+          return;
+        }
+        
+        if (rowsValue < 1 || rowsValue > 15) {
+          e.preventDefault();
+          alert('⚠️ 排数应在1-15之间');
+          resetButton();
+          return;
+        }
+      });
+
+      function resetButton() {
+        generateBtn.textContent = '🎯 生成座位表';
+        generateBtn.disabled = false;
+        document.body.classList.remove('loading');
+      }
+    }
+
+    // 输入框获得焦点时的动画效果
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+        this.parentElement.style.transition = 'transform 0.3s ease';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // 平滑滚动到结果
+    {% if seats %}
+    setTimeout(() => {
+      const resultContainer = document.querySelector('.result-container');
+      if (resultContainer) {
+        resultContainer.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 300);
+    {% endif %}
+  </script>
+
+</body>
+</html>

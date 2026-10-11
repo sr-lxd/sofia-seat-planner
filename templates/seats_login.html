@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sofia座位分配 - 登录</title>
+  <style>
+    /* 全局重置和基础样式 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.6;
+      /* 防止移动端页面晃动 */
+      overflow-x: hidden;
+      width: 100%;
+      position: relative;
+    }
+
+    /* 容器样式 */
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-top: 20px;
+    }
+
+    /* 顶部按钮区 */
+    .top-buttons {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .top-buttons button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #667eea;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-buttons button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    /* 标题样式 */
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 700;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 2px;
+    }
+
+    /* 表单样式 */
+    form {
+      width: 100%;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .input-group input[type="text"] {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .input-group input[type="text"]:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .input-group input[type="text"]::placeholder {
+      color: #999;
+      font-size: 14px;
+    }
+
+    /* 复选框样式 */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      color: #4a5568;
+      font-weight: 500;
+    }
+
+    /* 说明文字 */
+    .example-text {
+      background: #f0f4f8;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      border-left: 4px solid #667eea;
+    }
+
+    .example-text p {
+      margin: 0;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+
+    .example-text strong {
+      color: #2d3748;
+      font-weight: 600;
+    }
+
+    /* 提交按钮 */
+    input[type="submit"] {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    input[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    input[type="submit"]:active {
+      transform: translateY(0);
+    }
+
+    input[type="submit"]:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 警告信息 */
+    .warning {
+      background: #fed7d7;
+      color: #c53030;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      border: 1px solid #feb2b2;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* 移动端优化 */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+        /* 确保移动端不会水平滚动 */
+        overflow-x: hidden;
+        width: 100vw;
+      }
+
+      .container {
+        padding: 25px 20px;
+        margin-top: 10px;
+        border-radius: 16px;
+        /* 确保容器不会超出视窗 */
+        max-width: calc(100vw - 30px);
+        width: 100%;
+      }
+
+      h2 {
+        font-size: 24px;
+        margin-bottom: 25px;
+      }
+
+      .top-buttons {
+        margin-bottom: 15px;
+        /* 确保按钮区域不会超出 */
+        max-width: calc(100vw - 30px);
+        width: 100%;
+      }
+
+      .top-buttons button {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-width: 100px;
+        /* 确保按钮文字不会换行导致高度变化 */
+        white-space: nowrap;
+      }
+
+      .input-group input[type="text"] {
+        padding: 12px 16px;
+        /* 防止iOS自动缩放 - 关键！*/
+        font-size: 16px !important;
+        -webkit-text-size-adjust: 100%;
+        /* 防止输入框获得焦点时页面缩放 */
+        transform: translateZ(0);
+        -webkit-appearance: none;
+        border-radius: 12px;
+      }
+
+      input[type="submit"] {
+        padding: 14px;
+        /* 防止iOS自动缩放 */
+        font-size: 16px !important;
+        -webkit-text-size-adjust: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 20px 15px;
+        /* 更严格的宽度控制 */
+        max-width: calc(100vw - 20px);
+        margin-top: 5px;
+      }
+
+      .top-buttons {
+        flex-direction: column;
+        /* 确保不会超出屏幕 */
+        max-width: calc(100vw - 20px);
+      }
+
+      .top-buttons button {
+        min-width: auto;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      .input-group input[type="text"] {
+        /* 移动端输入框优化 */
+        font-size: 16px !important;
+        padding: 14px 16px;
+        /* 确保在小屏幕上足够的触摸区域 */
+        min-height: 48px;
+        box-sizing: border-box;
+      }
+
+      .checkbox-group {
+        padding: 12px 16px;
+        /* 确保复选框区域在小屏幕上不会太挤 */
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        /* 增大移动端复选框的点击区域 */
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+      }
+    }
+
+    /* 防止移动端横屏时的问题 */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 10px;
+        min-height: auto;
+      }
+      
+      .container {
+        margin-top: 5px;
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+    }
+
+    /* 动画效果 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* 加载状态 */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .loading input[type="submit"] {
+      background: #a0aec0;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部按钮 -->
+  <div class="top-buttons">
+    <button onclick="location.href='http://fjzxedu.top:5002'">
+      🏠 回Sofia数智平台
+    </button>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="container">
+    <h2>🪑 Sofia座位分配</h2>
+
+    <!-- 调试信息 -->
+    <div style="background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #1565c0;">
+      💡 <strong>使用提示：</strong>如果页面一直重定向，请点击浏览器的"刷新"按钮清除缓存，或者<a href="/seats/" style="color: #1565c0; text-decoration: underline;">点击这里重新开始</a>
+    </div>
+
+    <form action="{{ url_for('seats.login_page') }}" method="POST" id="loginForm">
+      <div class="input-group">
+        <label for="maleInput">👦 男生学号列表</label>
+        <input type="text" 
+               name="male_ids" 
+               id="maleInput" 
+               placeholder="例如: 1-20,45,47"
+               value="1-20,45,47" />
+      </div>
+      
+      <div class="input-group">
+        <label for="femaleInput">👧 女生学号列表</label>
+        <input type="text" 
+               name="female_ids" 
+               id="femaleInput" 
+               placeholder="例如: 21-44,46,48"
+               value="21-44,46,48" />
+      </div>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="rememberInputs">
+        <label for="rememberInputs">💾 记住学号列表，下次自动填充</label>
+      </div>
+
+      <div class="example-text">
+        <p>
+          <strong>📝 输入格式说明：</strong><br>
+          • 连续学号用 "-" 连接：<strong>1-20</strong> 表示 1 到 20<br>
+          • 多个学号用 "," 分隔：<strong>1-20,45,47</strong><br>
+          • 支持混合格式：<strong>1-10,15,20-25</strong>
+        </p>
+      </div>
+
+      <input type="submit" value="🚀 开始分配座位" id="submitBtn" />
+    </form>
+
+    {% if warning_msg %}
+    <div class="warning">
+      ⚠️ {{ warning_msg }}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- JavaScript：修复版本 -->
+  <script>
+    console.log('🪑 Sofia座位分配系统正在加载...');
+
+    // 统一使用DOMContentLoaded事件
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📋 开始初始化页面组件...');
+      
+      try {
+        initializeApp();
+        console.log('✅ Sofia座位分配系统初始化完成');
+      } catch (error) {
+        console.error('❌ 初始化失败:', error);
+      }
+    });
+
+    function initializeApp() {
+      // 获取所有必要的DOM元素
+      const form = document.getElementById('loginForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const maleInput = document.getElementById('maleInput');
+      const femaleInput = document.getElementById('femaleInput');
+      const rememberCheckbox = document.getElementById('rememberInputs');
+
+      // 检查必要元素是否存在
+      if (!form || !submitBtn || !maleInput || !femaleInput || !rememberCheckbox) {
+        console.error('❌ 缺少必要的DOM元素');
+        return;
+      }
+
+      console.log('✅ 所有DOM元素就绪');
+
+      // 初始化各个功能模块
+      loadSavedData();
+      setupFormValidation();
+      setupFormSubmission();
+      setupRememberFunction();
+      setupInputEffects();
+
+      console.log('🎯 所有功能模块初始化完成');
+    }
+
+    function loadSavedData() {
+      try {
+        const rememberEnabled = localStorage.getItem('seats_remember_enabled') === 'true';
+        const rememberCheckbox = document.getElementById('rememberInputs');
+        const maleInput = document.getElementById('maleInput');
+        const femaleInput = document.getElementById('femaleInput');
+        
+        if (rememberEnabled) {
+          rememberCheckbox.checked = true;
+          
+          const savedMaleIds = localStorage.getItem('seats_male_ids');
+          const savedFemaleIds = localStorage.getItem('seats_female_ids');
+          
+          if (savedMaleIds) {
+            maleInput.value = savedMaleIds;
+          }
+          if (savedFemaleIds) {
+            femaleInput.value = savedFemaleIds;
+          }
+          
+          console.log('💾 已恢复保存的学号列表');
+        }
+      } catch (error) {
+        console.error('❌ 加载保存数据失败:', error);
+      }
+    }
+
+    function saveDataIfNeeded() {
+      try {
+        const rememberCheckbox = document.getElementById('rememberInputs');
+        const maleInput = document.getElementById('maleInput');
+        const femaleInput = document.getElementById('femaleInput');
+        
+        if (rememberCheckbox.checked) {
+          localStorage.setItem('seats_remember_enabled', 'true');
+          localStorage.setItem('seats_male_ids', maleInput.value.trim());
+          localStorage.setItem('seats_female_ids', femaleInput.value.trim());
+          console.log('💾 已保存学号列表');
+        } else {
+          localStorage.removeItem('seats_remember_enabled');
+          localStorage.removeItem('seats_male_ids');
+          localStorage.removeItem('seats_female_ids');
+        }
+      } catch (error) {
+        console.error('❌ 保存数据失败:', error);
+      }
+    }
+
+    function setupFormValidation() {
+      const maleInput = document.getElementById('maleInput');
+      const femaleInput = document.getElementById('femaleInput');
+      const submitBtn = document.getElementById('submitBtn');
+
+      function validateInputs() {
+        const maleValue = maleInput.value.trim();
+        const femaleValue = femaleInput.value.trim();
+        const isValid = maleValue.length > 0 || femaleValue.length > 0;
+        
+        submitBtn.disabled = !isValid;
+        submitBtn.style.opacity = isValid ? '1' : '0.6';
+      }
+
+      maleInput.addEventListener('input', validateInputs);
+      femaleInput.addEventListener('input', validateInputs);
+      
+      // 初始验证
+      validateInputs();
+      
+      console.log('✅ 表单验证设置完成');
+    }
+
+    function setupFormSubmission() {
+      const form = document.getElementById('loginForm');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      form.addEventListener('submit', function(event) {
+        console.log('🚀 表单提交开始...');
+        
+        // 显示加载状态
+        submitBtn.value = '🔄 正在处理...';
+        submitBtn.disabled = true;
+        document.body.classList.add('loading');
+        
+        // 保存数据
+        saveDataIfNeeded();
+        
+        // 验证输入
+        const maleValue = document.getElementById('maleInput').value.trim();
+        const femaleValue = document.getElementById('femaleInput').value.trim();
+        
+        if (!maleValue && !femaleValue) {
+          event.preventDefault();
+          alert('⚠️ 请至少输入男生或女生学号列表中的一个');
+          
+          // 恢复按钮状态
+          submitBtn.value = '🚀 开始分配座位';
+          submitBtn.disabled = false;
+          document.body.classList.remove('loading');
+          
+          console.log('⚠️ 表单验证失败：输入为空');
+          return false;
+        }
+
+        console.log('✅ 表单验证通过，正在提交...');
+        return true;
+      });
+      
+      console.log('✅ 表单提交事件绑定完成');
+    }
+
+    function setupRememberFunction() {
+      const rememberCheckbox = document.getElementById('rememberInputs');
+      
+      rememberCheckbox.addEventListener('change', function() {
+        if (!this.checked) {
+          localStorage.removeItem('seats_remember_enabled');
+          localStorage.removeItem('seats_male_ids');
+          localStorage.removeItem('seats_female_ids');
+          console.log('🗑️ 已清除保存的数据');
+        }
+      });
+      
+      console.log('✅ 记住功能设置完成');
+    }
+
+    function setupInputEffects() {
+      document.querySelectorAll('input[type="text"]').forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'translateY(-2px)';
+          this.parentElement.style.transition = 'transform 0.3s ease';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'translateY(0)';
+        });
+      });
+      
+      console.log('✅ 输入框效果设置完成');
+    }
+
+    // 全局错误处理
+    window.addEventListener('error', function(event) {
+      console.error('❌ 页面错误:', event.message, '文件:', event.filename, '行号:', event.lineno);
+    });
+
+    console.log('📚 JavaScript加载完成，等待DOM ready...');
+  </script>
+
+</body>
+</html>
