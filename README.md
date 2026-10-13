@@ -1,5 +1,11 @@
 # Sofia 座位分配系统
 
+<!-- en-intro -->
+**Sofia Seat Planner** — a classroom seating tool (Flask): enter student numbers, rows and columns, then generate a seat chart with gender rules, fixed seats and must-sit-together pairs.
+<!-- /en-intro -->
+
+---
+
 基于 Flask 的教室座位安排工具。录入男女学号列表，设置排数和列数，程序按性别和约束条件生成座位表。默认只监听本机 `127.0.0.1`，局域网内其他设备无法访问。
 
 ## 功能
